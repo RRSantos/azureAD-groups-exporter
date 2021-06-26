@@ -48,7 +48,7 @@ namespace azureAD_groups_exporter
                 return Task.CompletedTask;
             }));
         }
-        private async Task setAllChilds(Group group, Model.EntityItem entity)
+        private async Task setAllChilds(Group group, Model.EntityItem entity, bool exportUsers)
         {
             foreach (var m in group.Members)
             {
@@ -74,39 +74,38 @@ namespace azureAD_groups_exporter
 
                     if (actualGroupWithMembers.Members != null)
                     {
-                        await setAllChilds(actualGroupWithMembers, internalEntity);
+                        await setAllChilds(actualGroupWithMembers, internalEntity, exportUsers);
                     }
                 }
-                //else if (m is User)
-                //{
-                //    User user = usersCache.FirstOrDefault(u => u.Id == m.Id);
+                else if ((m is User) && exportUsers)
+                {   
+                    User user = usersCache.FirstOrDefault(u => u.Id == m.Id);
 
-                //    if (user == null)
-                //    {
-                //        IGraphServiceUsersCollectionPage allUsers = await graphServiceClient
-                //        .Users
-                //        .Request()
-                //        .Filter($"id eq '{m.Id}'")
-                //        .GetAsync();
+                    if (user == null)
+                    {
+                        IGraphServiceUsersCollectionPage allUsers = await graphServiceClient
+                        .Users
+                        .Request()
+                        .Filter($"id eq '{m.Id}'")
+                        .GetAsync();
 
-                //        user = allUsers.First();
-                //        usersCache.Add(user);
-                //    }
+                        user = allUsers.First();
+                        usersCache.Add(user);
+                    }
 
 
-                //    Model.EntityItem internalEntity = new Model.EntityItem(user.DisplayName, user.Id, Model.EntityType.User);
-                //    entity.AddChild(internalEntity);
-                //}
+                    Model.EntityItem internalEntity = new Model.EntityItem(user.DisplayName, user.Id, Model.EntityType.User);
+                    entity.AddChild(internalEntity);
+                }
             }
         }
 
-        public async Task<List<Model.EntityItem>> GetAllGroupsAndMembers()
+        public async Task<List<Model.EntityItem>> GetAllGroupsAndMembers(bool exportUsers)
         {
             var allGroups = await graphServiceClient
                 .Groups
                 .Request()
                 .Expand("Members")
-                //.Filter($"id eq '0061509b-ed0f-4344-bed4-3621e5e2ea48'")
                 .GetAsync();
 
             List<Model.EntityItem> allEntities = new List<Model.EntityItem>();
@@ -115,7 +114,7 @@ namespace azureAD_groups_exporter
                 groupsCache.Add(group);
                 Model.EntityItem newEntity = new Model.EntityItem(group.DisplayName, group.Id, Model.EntityType.Group);
                 
-                await setAllChilds(group, newEntity);
+                await setAllChilds(group, newEntity, exportUsers);
                 allEntities.Add(newEntity);
                 
             }

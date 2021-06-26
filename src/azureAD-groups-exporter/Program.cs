@@ -19,7 +19,7 @@ namespace azureAD_groups_exporter
                    {
                        stopwatch.Start();
                        GroupMemberService service = new GroupMemberService(o.TenantId, o.ClientId, o.ClientSecret);
-                       var allEntities = service.GetAllGroupsAndMembers().Result;
+                       var allEntities = service.GetAllGroupsAndMembers(o.ExportUsers).Result;
                        stopwatch.Stop();
                        Console.WriteLine($"Elapsed time to get all groups am members: {stopwatch.Elapsed}");
                        

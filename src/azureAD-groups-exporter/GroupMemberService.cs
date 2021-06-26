@@ -44,39 +44,55 @@ namespace azureAD_groups_exporter
                 return Task.CompletedTask;
             }));
         }
-        private void setAllChilds(Group group, Model.EntityItem entity)
+        private async Task setAllChilds(Group group, Model.EntityItem entity)
         {
             foreach (var m in group.Members)
             {
                 if (m is Group actualGroup)
                 {
-                    Model.EntityItem internalEntity = new Model.EntityItem(actualGroup.DisplayName, actualGroup.Id, "Group");
+                    Model.EntityItem internalEntity = new Model.EntityItem(actualGroup.DisplayName, actualGroup.Id, Model.EntityType.Group);
                     entity.AddChild(internalEntity);
 
-                    Group actualGroupWithMembers = graphServiceClient.Groups.Request().Filter($"id eq '{actualGroup.Id}'").Expand("Members").GetAsync().Result[0];
+                    IGraphServiceGroupsCollectionPage allGroups = await graphServiceClient
+                        .Groups
+                        .Request()
+                        .Filter($"id eq '{actualGroup.Id}'")
+                        .Expand("Members")
+                        .GetAsync();
+
+                    Group actualGroupWithMembers = allGroups[0];
+
                     if (actualGroupWithMembers.Members != null)
                     {
-                        setAllChilds(actualGroupWithMembers, internalEntity);
+                        await setAllChilds(actualGroupWithMembers, internalEntity);
                     }
                 }
                 else if (m is User)
                 {
-                    User user = graphServiceClient.Users.Request().Filter($"id eq '{m.Id}'").GetAsync().Result.CurrentPage[0];
-                    Model.EntityItem internalEntity = new Model.EntityItem(user.DisplayName, user.Id, "User");
+                    IGraphServiceUsersCollectionPage allUsers = await graphServiceClient
+                        .Users
+                        .Request()
+                        .Filter($"id eq '{m.Id}'")
+                        .GetAsync();
+
+                    User user = allUsers[0];
+                    //User user = allUsers.CurrentPage[0];
+
+                    Model.EntityItem internalEntity = new Model.EntityItem(user.DisplayName, user.Id, Model.EntityType.User);
                     entity.AddChild(internalEntity);
                 }
             }
         }
 
-        public List<Model.EntityItem> GetAllGroupsAndMembers()
+        public async Task<List<Model.EntityItem>> GetAllGroupsAndMembers()
         {
-            var allGroups = graphServiceClient.Groups.Request().Expand("Members").GetAsync().Result;
+            var allGroups = await graphServiceClient.Groups.Request().Expand("Members").GetAsync();
 
             List<Model.EntityItem> allEntities = new List<Model.EntityItem>();
             foreach (var group in allGroups)
             {
-                Model.EntityItem newEntity = new Model.EntityItem(group.DisplayName, group.Id, "Group");
-                setAllChilds(group, newEntity);
+                Model.EntityItem newEntity = new Model.EntityItem(group.DisplayName, group.Id, Model.EntityType.Group);
+                await setAllChilds(group, newEntity);
                 allEntities.Add(newEntity);
             }
 

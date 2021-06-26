@@ -11,7 +11,7 @@ namespace azureAD_groups_exporter.Model
         public string Name { get; private set; }
         public string Id { get; private set; }
 
-        public string Type { get; private set; }
+        public EntityType Type { get; private set; }
 
         public List<EntityItem> Childs { get; private set; }
 
@@ -20,7 +20,7 @@ namespace azureAD_groups_exporter.Model
             Childs.Add(child);
         }
 
-        public EntityItem(string name, string id, string type)
+        public EntityItem(string name, string id, EntityType type)
         {
             Name = name;
             Id = id;

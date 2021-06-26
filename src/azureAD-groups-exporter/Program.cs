@@ -11,10 +11,10 @@ namespace azureAD_groups_exporter
         static void Main(string[] args)
         {
             Parser.Default.ParseArguments<CommandLineOptions>(args)
-                   .WithParsed<CommandLineOptions>(o =>
+                   .WithParsed(o =>
                    {
                        GroupMemberService service = new GroupMemberService(o.TenantId, o.ClientId, o.ClientSecret);
-                       var allEntities = service.GetAllGroupsAndMembers();
+                       var allEntities = service.GetAllGroupsAndMembers().Result;
                        Display(allEntities);
                    }); 
         }

@@ -12,5 +12,6 @@ namespace azureAD_groups_exporter
 
         [Option('s', "clientSecret", Required = true, HelpText = "Client secret defined for application defined in 'clientId' parameter.")]
         public string ClientSecret { get; set; }
+        
     }
 }

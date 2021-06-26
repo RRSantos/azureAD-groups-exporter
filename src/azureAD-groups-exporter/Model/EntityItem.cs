@@ -10,23 +10,28 @@ namespace azureAD_groups_exporter.Model
     {
         public string Name { get; private set; }
         public string Id { get; private set; }
+        
+        public int NumberOfChildrenOverHierarchy { get; private set; }
 
         public EntityType Type { get; private set; }
 
-        public List<EntityItem> Childs { get; private set; }
+        public List<EntityItem> Children { get; private set; }
 
         public void AddChild(EntityItem child)
         {
-            Childs.Add(child);
+            NumberOfChildrenOverHierarchy++;
+            Children.Add(child);
+            NumberOfChildrenOverHierarchy += child.NumberOfChildrenOverHierarchy;
         }
 
         public EntityItem(string name, string id, EntityType type)
         {
+            
             Name = name;
             Id = id;
             Type = type;
-            Childs = new List<EntityItem>();
-            
+            Children = new List<EntityItem>();
+            NumberOfChildrenOverHierarchy = 0;
         }  
     }
 }

@@ -10,6 +10,7 @@
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
     <PackageReference Include="Microsoft.Graph" Version="3.35.0" />
     <PackageReference Include="Microsoft.Identity.Client" Version="4.32.1" />
+    <PackageReference Include="OrgChart" Version="1.0.0" />
   </ItemGroup>
 
 </Project>

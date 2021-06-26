@@ -1,6 +1,7 @@
 ﻿using Microsoft.Graph;
 using Microsoft.Identity.Client;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -15,6 +16,9 @@ namespace azureAD_groups_exporter
         private readonly string tenantID;
         private readonly string clientId;
         private readonly string clientSecret;
+
+        private readonly List<Group>  groupsCache = new List<Group>();
+        private readonly List<User> usersCache = new List<User>();
 
         public GroupMemberService(string tenantID, string clientId, string clientSecret)
         {
@@ -53,47 +57,67 @@ namespace azureAD_groups_exporter
                     Model.EntityItem internalEntity = new Model.EntityItem(actualGroup.DisplayName, actualGroup.Id, Model.EntityType.Group);
                     entity.AddChild(internalEntity);
 
-                    IGraphServiceGroupsCollectionPage allGroups = await graphServiceClient
+                    Group actualGroupWithMembers = groupsCache.FirstOrDefault( g => g.Id == actualGroup.Id);
+
+                    if (actualGroupWithMembers == null)
+                    {
+                        IGraphServiceGroupsCollectionPage allGroups = await graphServiceClient
                         .Groups
                         .Request()
                         .Filter($"id eq '{actualGroup.Id}'")
                         .Expand("Members")
                         .GetAsync();
 
-                    Group actualGroupWithMembers = allGroups[0];
+                        actualGroupWithMembers = allGroups.First();
+                        groupsCache.Add(actualGroupWithMembers);
+                    }                    
 
                     if (actualGroupWithMembers.Members != null)
                     {
                         await setAllChilds(actualGroupWithMembers, internalEntity);
                     }
                 }
-                else if (m is User)
-                {
-                    IGraphServiceUsersCollectionPage allUsers = await graphServiceClient
-                        .Users
-                        .Request()
-                        .Filter($"id eq '{m.Id}'")
-                        .GetAsync();
+                //else if (m is User)
+                //{
+                //    User user = usersCache.FirstOrDefault(u => u.Id == m.Id);
 
-                    User user = allUsers[0];
-                    //User user = allUsers.CurrentPage[0];
+                //    if (user == null)
+                //    {
+                //        IGraphServiceUsersCollectionPage allUsers = await graphServiceClient
+                //        .Users
+                //        .Request()
+                //        .Filter($"id eq '{m.Id}'")
+                //        .GetAsync();
 
-                    Model.EntityItem internalEntity = new Model.EntityItem(user.DisplayName, user.Id, Model.EntityType.User);
-                    entity.AddChild(internalEntity);
-                }
+                //        user = allUsers.First();
+                //        usersCache.Add(user);
+                //    }
+
+
+                //    Model.EntityItem internalEntity = new Model.EntityItem(user.DisplayName, user.Id, Model.EntityType.User);
+                //    entity.AddChild(internalEntity);
+                //}
             }
         }
 
         public async Task<List<Model.EntityItem>> GetAllGroupsAndMembers()
         {
-            var allGroups = await graphServiceClient.Groups.Request().Expand("Members").GetAsync();
+            var allGroups = await graphServiceClient
+                .Groups
+                .Request()
+                .Expand("Members")
+                //.Filter($"id eq '0061509b-ed0f-4344-bed4-3621e5e2ea48'")
+                .GetAsync();
 
             List<Model.EntityItem> allEntities = new List<Model.EntityItem>();
             foreach (var group in allGroups)
             {
+                groupsCache.Add(group);
                 Model.EntityItem newEntity = new Model.EntityItem(group.DisplayName, group.Id, Model.EntityType.Group);
+                
                 await setAllChilds(group, newEntity);
                 allEntities.Add(newEntity);
+                
             }
 
             return allEntities;

@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "azureAD-groups-exporter": {
+      "commandName": "Project"
+    }
+  }
+}

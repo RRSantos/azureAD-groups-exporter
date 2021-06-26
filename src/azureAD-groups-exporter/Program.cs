@@ -1,8 +1,11 @@
 ﻿using azureAD_groups_exporter.Model;
 using CommandLine;
+using OrgChart;
 using System;
 using System.Collections.Generic;
-
+using System.Linq;
+using System.Drawing;
+using System.IO;
 
 namespace azureAD_groups_exporter
 {
@@ -10,24 +13,23 @@ namespace azureAD_groups_exporter
     {   
         static void Main(string[] args)
         {
+            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch(); 
             Parser.Default.ParseArguments<CommandLineOptions>(args)
                    .WithParsed(o =>
                    {
+                       stopwatch.Start();
                        GroupMemberService service = new GroupMemberService(o.TenantId, o.ClientId, o.ClientSecret);
                        var allEntities = service.GetAllGroupsAndMembers().Result;
-                       Display(allEntities);
+                       stopwatch.Stop();
+                       Console.WriteLine($"Elapsed time to get all groups am members: {stopwatch.Elapsed}");
+                       
+                       stopwatch.Restart();                       
+                       ImageExporter exporter = new ImageExporter(allEntities);
+                       exporter.Export(o.Filename);                       
+                       Console.WriteLine($"Elapsed time to export all groups am members: {stopwatch.Elapsed}");
                    }); 
         }
 
-        private static void Display(List<EntityItem> allEntities, int level =0)
-        {
-            string spaceLevel = new string(' ', level*4);
-
-            foreach (EntityItem entity in allEntities)
-            {   
-                Console.WriteLine($"{spaceLevel}{entity.Type}: {entity.Name} ({entity.Id})");
-                Display(entity.Childs, level + 1);                
-            }
-        }
+                
     }
 }

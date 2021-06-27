@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AzureAD group export result</title>
+  <link rel="icon" href="img/logo.png">
+  <link rel="stylesheet" href="css/jquery.orgchart.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="chart-container"></div>
+
+  <script type="text/javascript" src="js/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" src="js/jquery.orgchart.min.js"></script>
+  <script type="text/javascript" src="js/data.json"></script>
+  <script type="text/javascript" >
+  $('#chart-container').orgchart({
+      'data' : datasource,
+      'nodeContent': 'title'
+    });
+  
+  </script>  
+  
+  
+  </body>
+</html>

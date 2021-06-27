@@ -13,8 +13,8 @@ namespace azureAD_groups_exporter
         [Option('s', "clientSecret", Required = true, HelpText = "Client secret defined for application defined in 'clientId' parameter.")]
         public string ClientSecret { get; set; }
 
-        [Option('f', "filename", Required = false, Default = "azureAD-group-export.png", HelpText = "Name of image file (.png extension) to export azureAD-group-exporter results.")]
-        public string Filename { get; set; }
+        [Option('o', "outputFolder", Required = false, Default = "export/", HelpText = "Folder to export HTML/JS/CSS files.")]
+        public string OutputFolder { get; set; }
 
         [Option('u', "exportUsers", Required = false, Default = false, HelpText = "Export users as members (true) or only groups (false).")]
         public bool ExportUsers { get; set; }

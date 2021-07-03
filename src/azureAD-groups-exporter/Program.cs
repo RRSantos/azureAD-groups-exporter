@@ -31,7 +31,7 @@ namespace azureAD_groups_exporter
         }
 
         static void exportHTML(IEnumerable<EntityItem> allEntities, string exportFolder)
-        {
+        {   
             //Todo: Do not export group if it has parent
             //Todo: Move to specialized class
 

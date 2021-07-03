@@ -18,19 +18,22 @@ namespace azureAD_groups_exporter.Model
         [JsonPropertyName("title")]
         public string Title { get { return Type.ToString("f"); } }
 
+        [JsonPropertyName("email")]
+        public string Email { get; private set; }
+
         [JsonPropertyName("children")]
         public List<EntityItem> Children { get; private set; }
 
         public void AddChild(EntityItem child)
-        {   
-            Children.Add(child);
-        }
-
-        public EntityItem(string name, string id, EntityType type)
         {
-            
+            Children.Add(child);
+        }        
+
+        public EntityItem(string name, string id, string email, EntityType type)
+        {   
             Name = name;
             Id = id;
+            Email = email;
             Type = type;
             Children = new List<EntityItem>();
         }  

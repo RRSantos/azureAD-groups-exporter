@@ -13,7 +13,6 @@ body {
 
 #chart-container {
   position: relative;
-  /*height: 420px; */
   border: 1px solid #aaa;
   margin: 0.5rem;
   overflow: auto;

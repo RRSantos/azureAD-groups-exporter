@@ -225,21 +225,21 @@
   border-left-color: rgba(68, 157, 68, 0.8);
 }
 
-.orgchart .node .title {
-  box-sizing: border-box;
-  padding: 2px;
-  width: 130px;
-  text-align: center;
-  font-size: 0.75rem;
-  font-weight: bold;
-  height: 20px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  background-color: rgba(217, 83, 79, 0.8);
-  color: #fff;
-  border-radius: 4px 4px 0 0; 
-}
+    .orgchart .node .title {
+        box-sizing: border-box;
+        padding: 2px;
+        width: 200px;
+        text-align: center;
+        font-size: 0.75rem;
+        font-weight: bold;
+        height: 20px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        background-color: rgba(217, 83, 79, 0.8);
+        color: #fff;
+        border-radius: 4px 4px 0 0;
+    }
 
 .orgchart.b2t .node .title {
   transform: rotate(-180deg);
@@ -271,19 +271,36 @@
   background-color: #fff;
 }
 
-.orgchart .node .content {
-  box-sizing: border-box;
-  padding: 2px;
-  height: 20px;
-  font-size: 0.625rem;
-  border: 1px solid rgba(217, 83, 79, 0.8);
-  border-radius: 0 0 4px 4px;
-  text-align: center;
-  background-color: #fff;
-  color: #333;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+    .orgchart .node .content {
+        box-sizing: border-box;
+        padding: 2px;
+        height: 45px;
+        font-size: 0.7rem;
+        border: 1px solid rgba(217, 83, 79, 0.8);
+        border-radius: 0 0 0 0;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #fff;
+        color: #333;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .orgchart .node .type {
+        box-sizing: border-box;
+        padding: 2px;
+        height: 20px;
+        font-size: 0.730rem;
+        border: 1px solid rgba(217, 83, 79, 0.8);
+        border-radius: 0 0 4px 4px;
+        text-align: center;
+        background-color: rgba(217, 83, 79, 0.8);
+        color: #fff;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 
 .orgchart.b2t .node .content {
   transform: rotate(180deg);

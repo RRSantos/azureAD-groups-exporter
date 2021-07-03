@@ -14,10 +14,24 @@
   <script type="text/javascript" src="js/jquery.orgchart.min.js"></script>
   <script type="text/javascript" src="js/data.json"></script>
   <script type="text/javascript" >
-  $('#chart-container').orgchart({
-      'data' : datasource,
-      'nodeContent': 'title'
-    });
+      var nodeTemplate = function (data) {
+          return `        
+        <div class="title">${data.name}</div>				
+		<div class="content">${data.email}</div>
+		<div class="type">${data.title}</div>
+      `;
+      };
+
+      var oc = $('#chart-container').orgchart({
+          'data': datasource,
+          'nodeTemplate': nodeTemplate,
+          'pan': true,
+          'zoom': true
+      });
+
+      oc.$chartContainer.on('touchmove', function (event) {
+          event.preventDefault();
+      });
   
   </script>  
   

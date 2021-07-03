@@ -54,7 +54,11 @@ namespace azureAD_groups_exporter
             {
                 if (m is Group actualGroup)
                 {
-                    Model.EntityItem internalEntity = new Model.EntityItem(actualGroup.DisplayName, actualGroup.Id, Model.EntityType.Group);
+                    Model.EntityItem internalEntity = new Model.EntityItem(
+                        actualGroup.DisplayName, 
+                        actualGroup.Id,
+                        actualGroup.Mail,
+                        Model.EntityType.Group);
                     entity.AddChild(internalEntity);
 
                     Group actualGroupWithMembers = groupsCache.FirstOrDefault( g => g.Id == actualGroup.Id);
@@ -94,7 +98,11 @@ namespace azureAD_groups_exporter
                     }
 
 
-                    Model.EntityItem internalEntity = new Model.EntityItem(user.DisplayName, user.Id, Model.EntityType.User);
+                    Model.EntityItem internalEntity = new Model.EntityItem(
+                        user.DisplayName, 
+                        user.Id,
+                        user.Mail,
+                        Model.EntityType.User);
                     entity.AddChild(internalEntity);
                 }
             }
@@ -110,12 +118,18 @@ namespace azureAD_groups_exporter
 
             List<Model.EntityItem> allEntities = new List<Model.EntityItem>();
             foreach (var group in allGroups)
-            {
-                groupsCache.Add(group);
-                Model.EntityItem newEntity = new Model.EntityItem(group.DisplayName, group.Id, Model.EntityType.Group);
-                
-                await setAllChilds(group, newEntity, exportUsers);
-                allEntities.Add(newEntity);
+            {   
+                if (!groupsCache.Exists(e => e.Id == group.Id))
+                {
+                    groupsCache.Add(group);
+                    Model.EntityItem nextEntity = new Model.EntityItem(
+                        group.DisplayName, 
+                        group.Id,
+                        group.Mail,
+                        Model.EntityType.Group);
+                    await setAllChilds(group, nextEntity, exportUsers);
+                    allEntities.Add(nextEntity);
+                }
                 
             }
 

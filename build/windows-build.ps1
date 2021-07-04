@@ -6,7 +6,7 @@ param (
 	[Parameter(Mandatory)]
 	$PackageName
 )
-$version = ${env:GITHUB_REF} -replace 'refs/\w+/\w+', ''
+$version = ${env:GITHUB_REF} -replace 'refs/\w+/\D*', ''
 Write-Output "Restoring dependencies"
 dotnet restore "$SolutionPath"
 

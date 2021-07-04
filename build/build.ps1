@@ -12,7 +12,3 @@ dotnet restore "$SolutionPath"
 
 Write-Output "Publishing app"
 dotnet publish "$SolutionPath" --output "$PublishFolder" --configuration Release /p:version="$version"
-
-#Write-Output "Zipping files"
-#cd "$PublishFolder" && tar.exe -a -c -f "$PackageName" *.* Template/*.* -C "$PublishFolder" && cd ..
-

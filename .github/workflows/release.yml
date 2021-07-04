@@ -26,13 +26,8 @@ jobs:
       with:
         dotnet-version: 5.0.x
     - name: Publish application 
-      run: .\build\windows-build.ps1 -SolutionPath ${{ env.SOLUTION_FILE }} -PublishFolder ${{ env.PUBLISH_FOLDER }} -PackageName ${{ env.WINDOWS_PACKAGE_NAME }}.zip
+      run: .\build\build.ps1 -SolutionPath ${{ env.SOLUTION_FILE }} -PublishFolder ${{ env.PUBLISH_FOLDER }} -PackageName ${{ env.WINDOWS_PACKAGE_NAME }}.zip
       shell: pwsh
-
-#    - name: Restore dependencies
-#      run: dotnet restore ${{ env.SOLUTION_FILE }}
-#    - name: Publish
-#      run: dotnet publish ${{ env.SOLUTION_FILE }} --output ${{ env.PUBLISH_FOLDER }} --configuration Release --version-suffix ${{ steps.tag.outputs.result }}
     - name: Zip Release Windows
       run: cd ${{ env.PUBLISH_FOLDER }} && tar.exe -a -c -f ${{ env.WINDOWS_PACKAGE_NAME }}.zip *.exe *.dll *.json Template/*.* -C ${{ env.PUBLISH_FOLDER }} && cd ..    
     - uses: actions/upload-artifact@v2
@@ -50,12 +45,8 @@ jobs:
       with:
         dotnet-version: 5.0.x
     - name: Publish application 
-      run: .\build\windows-build.ps1 -SolutionPath ${{ env.SOLUTION_FILE }} -PublishFolder ${{ env.PUBLISH_FOLDER }} -PackageName ${{ env.LINUX_PACKAGE_NAME }}.zip
+      run: .\build\build.ps1 -SolutionPath ${{ env.SOLUTION_FILE }} -PublishFolder ${{ env.PUBLISH_FOLDER }} -PackageName ${{ env.LINUX_PACKAGE_NAME }}.zip
       shell: pwsh
-#    - name: Restore dependencies
-#      run: dotnet restore ${{ env.SOLUTION_FILE }}
-#    - name: Publish
-#      run: dotnet publish ${{ env.SOLUTION_FILE }} --output ${{ env.PUBLISH_FOLDER }} --configuration Release --version-suffix ${{ github.ref }}
     - name: Zip Release Linux
       run: cd ${{ env.PUBLISH_FOLDER }} && zip ${{ env.LINUX_PACKAGE_NAME }}.zip * -r && cd ..
     - uses: actions/upload-artifact@v2
@@ -74,13 +65,8 @@ jobs:
       with:
         dotnet-version: 5.0.x
     - name: Publish application 
-      run: .\build\windows-build.ps1 -SolutionPath ${{ env.SOLUTION_FILE }} -PublishFolder ${{ env.PUBLISH_FOLDER }} -PackageName ${{ env.MACOS_PACKAGE_NAME }}.zip
+      run: .\build\build.ps1 -SolutionPath ${{ env.SOLUTION_FILE }} -PublishFolder ${{ env.PUBLISH_FOLDER }} -PackageName ${{ env.MACOS_PACKAGE_NAME }}.zip
       shell: pwsh
-
-#    - name: Restore dependencies
-#      run: dotnet restore ${{ env.SOLUTION_FILE }}
-#    - name: Publish
-#      run: dotnet publish ${{ env.SOLUTION_FILE }} --output ${{ env.PUBLISH_FOLDER }} --configuration Release --version-suffix ${{ github.ref }}
     - name: Zip Release MacOs
       run: cd ${{ env.PUBLISH_FOLDER }} && zip ${{ env.MACOS_PACKAGE_NAME }}.zip * -r && cd ..
     - uses: actions/upload-artifact@v2

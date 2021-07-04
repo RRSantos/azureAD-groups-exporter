@@ -5,6 +5,13 @@ on:
     tags:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
+env:
+  SOLUTION_FILE: src/azureAD-groups-exporter/azureAD-groups-exporter.sln
+  PUBLISH_FOLDER: publish
+  RELEASE_NAME_PREFIX: azureAD-groups-exporter
+  WINDOWS_PACKAGE_NAME: ${{ env.RELEASE_NAME_PREFIX }}-windows
+  LINUX_PACKAGE_NAME: ${{ env.RELEASE_NAME_PREFIX }}-linux
+  MAC_PACKAGE_NAME: ${{ env.RELEASE_NAME_PREFIX }}-macos
 
 jobs:
   build_windows:
@@ -18,15 +25,15 @@ jobs:
       with:
         dotnet-version: 5.0.x
     - name: Restore dependencies
-      run: dotnet restore src/azureAD-groups-exporter/azureAD-groups-exporter.sln    
+      run: dotnet restore ${{ env.SOLUTION_FILE }}
     - name: Publish
-      run: dotnet publish src/azureAD-groups-exporter/azureAD-groups-exporter.sln --output publish/ --configuration Release
+      run: dotnet publish ${{ env.SOLUTION_FILE }} --output ${{ env.PUBLISH_FOLDER }} --configuration Release
     - name: Zip Release Windows
-      run: cd publish && tar.exe -a -c -f azureAD-groups-exporter-windows.zip *.exe *.dll *.json Template/*.* -C publish && cd ..    
+      run: cd ${{ env.PUBLISH_FOLDER }} && tar.exe -a -c -f ${{ env.WINDOWS_PACKAGE_NAME }}.zip *.exe *.dll *.json Template/*.* -C ${{ env.PUBLISH_FOLDER }} && cd ..    
     - uses: actions/upload-artifact@v2
       with:
-        name: azureAD-groups-exporter-windows
-        path: publish/azureAD-groups-exporter-windows.zip
+        name: ${{ env.WINDOWS_PACKAGE_NAME }}
+        path: ${{ env.PUBLISH_FOLDER }}/${{ env.WINDOWS_PACKAGE_NAME }}.zip
 
   create_release_and_publish_artifacts:
     needs: [build_windows]
@@ -34,8 +41,8 @@ jobs:
     steps:
     - uses: actions/download-artifact@v2
       with:
-        name: azureAD-groups-exporter-windows
-        path: publish
+        name: ${{ env.WINDOWS_PACKAGE_NAME }}
+        path: ${{ env.PUBLISH_FOLDER }}
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -43,7 +50,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
       with:
         tag_name: ${{ github.ref }}
-        release_name: azureAD-groups-exporter-${{ github.ref }}          
+        release_name: ${{ env.RELEASE_NAME }}-${{ github.ref }}          
         draft: false
         prerelease: false
     - name: Upload Release Asset - Windows
@@ -53,7 +60,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: publish/azureAD-groups-exporter-windows.zip
-        asset_name: azureAD-groups-exporter-windows.zip
+        asset_path: ${{ env.PUBLISH_FOLDER }}/${{ env.WINDOWS_PACKAGE_NAME }}.zip
+        asset_name: ${{ env.WINDOWS_PACKAGE_NAME }}.zip
         asset_content_type: application/zip
       

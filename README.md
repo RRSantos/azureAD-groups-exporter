@@ -14,7 +14,8 @@ Simple CLI tool to export all Azure AD groups and its members to a single HTML p
 5. [Generate a client secret](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app#add-a-client-secret) for the application created on step #2  and **write down** its ``Value`` property;
 
 ### Download the app
-- Todo
+- Go to [Releases](https://github.com/RRSantos/azureAD-groups-exporter/releases) section and download a .zip file acordingly with your OS (windows, linux or mac);
+- Uncompress the .zip file downloaded;
 
 ### Run the app
 To export export groups from Azure Active Directory from your directory, use the command line below.

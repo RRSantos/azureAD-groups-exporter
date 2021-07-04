@@ -7,28 +7,25 @@ namespace azureAD_groups_exporter
     {   
         static void Main(string[] args)
         {
-            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch(); 
+            //Todo: Add loggers to console/file
             Parser.Default.ParseArguments<CommandLineOptions>(args)
                    .WithParsed(o =>
                    {
-                       stopwatch.Start();
-
                        Microsoft.Graph.IGraphServiceClient graphServiceClient = GraphServiceClientBuilder.Create(
                            o.TenantId,
                            o.ClientId,
                            o.ClientSecret);
                        
                        GroupMemberService service = new GroupMemberService(graphServiceClient);
+                       Console.WriteLine("Getting groups and its members from Azure AD...");
                        var allEntities = service.GetAllGroupsAndMembers(o.ExportUsers).Result;
-                       stopwatch.Stop();
-                       Console.WriteLine($"Elapsed time to get all groups and its members: {stopwatch.Elapsed}");
-                       
-                       stopwatch.Restart();
+                       Console.WriteLine($"Found {allEntities.Count} root group(s) to export.");
 
+                       Console.WriteLine("Exporting item(s) to HTML...");
                        HtmlExporter exporter = new HtmlExporter(o.OutputFolder);
                        exporter.Export(allEntities);
                        
-                       Console.WriteLine($"Elapsed time to export all groups and its members: {stopwatch.Elapsed}");
+                       Console.WriteLine($"Items successfully exported to '{o.OutputFolder}' folder!");
                    }); 
         }
 

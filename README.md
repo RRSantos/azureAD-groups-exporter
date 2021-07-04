@@ -1,5 +1,6 @@
-[![Windows build](https://github.com/RRSantos/azureAD-groups-exporter/actions/workflows/CI-Windows.yml/badge.svg)](https://github.com/RRSantos/azureAD-groups-exporter/actions/workflows/CI-Windows.yml)
-[![Linux build](https://github.com/RRSantos/azureAD-groups-exporter/actions/workflows/CI-Ubuntu.yml/badge.svg)](https://github.com/RRSantos/azureAD-groups-exporter/actions/workflows/CI-Ubuntu.yml)
+[![Windows ci build](https://github.com/RRSantos/azureAD-groups-exporter/actions/workflows/CI-Windows.yml/badge.svg)](https://github.com/RRSantos/azureAD-groups-exporter/actions/workflows/CI-Windows.yml)
+[![Linux ci build](https://github.com/RRSantos/azureAD-groups-exporter/actions/workflows/CI-Ubuntu.yml/badge.svg)](https://github.com/RRSantos/azureAD-groups-exporter/actions/workflows/CI-Ubuntu.yml)
+[![Release](https://github.com/RRSantos/azureAD-groups-exporter/actions/workflows/release.yml/badge.svg)](https://github.com/RRSantos/azureAD-groups-exporter/actions/workflows/release.yml)
 
 # azureAD-groups-exporter
 Simple CLI tool to export all Azure AD groups and its members to a single HTML page using [dabeng's OrgChart](https://github.com/dabeng/OrgChart)

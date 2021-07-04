@@ -28,12 +28,12 @@ jobs:
       run: dotnet restore ${{ env.SOLUTION_FILE }}
     - name: Publish
       run: dotnet publish ${{ env.SOLUTION_FILE }} --output ${{ env.PUBLISH_FOLDER }} --configuration Release
-    - name: Zip Release Windows
-      run: cd ${{ env.PUBLISH_FOLDER }} && tar.exe -a -c -f ${{ env.WINDOWS_PACKAGE_NAME }}.zip *.exe *.dll *.json Template/*.* -C ${{ env.PUBLISH_FOLDER }} && cd ..    
+    #- name: Zip Release Windows
+    #  run: cd ${{ env.PUBLISH_FOLDER }} && tar.exe -a -c -f ${{ env.WINDOWS_PACKAGE_NAME }}.zip *.exe *.dll *.json Template/*.* -C ${{ env.PUBLISH_FOLDER }} && cd ..    
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ env.WINDOWS_PACKAGE_NAME }}
-        path: ${{ env.PUBLISH_FOLDER }}/${{ env.WINDOWS_PACKAGE_NAME }}.zip
+        path: ${{ env.PUBLISH_FOLDER }}
 
   build_linux:
 
@@ -49,15 +49,15 @@ jobs:
       run: dotnet restore ${{ env.SOLUTION_FILE }}
     - name: Publish
       run: dotnet publish ${{ env.SOLUTION_FILE }} --output ${{ env.PUBLISH_FOLDER }} --configuration Release
-    - name: Zip Release Linux
-      uses: thedoctor0/zip-release@master
-      with:
-        filename: ${{ env.PUBLISH_FOLDER }}/${{ env.LINUX_PACKAGE_NAME }}.zip
-        path: ${{ env.PUBLISH_FOLDER }}
+    #- name: Zip Release Linux
+    #  uses: thedoctor0/zip-release@master
+    #  with:
+    #    filename: ${{ env.PUBLISH_FOLDER }}/${{ env.LINUX_PACKAGE_NAME }}.zip
+    #    path: ${{ env.PUBLISH_FOLDER }}
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ env.LINUX_PACKAGE_NAME }}
-        path: ${{ env.PUBLISH_FOLDER }}/${{ env.LINUX_PACKAGE_NAME }}.zip
+        path: ${{ env.PUBLISH_FOLDER }}
 
   build_macos:
 
@@ -73,15 +73,15 @@ jobs:
       run: dotnet restore ${{ env.SOLUTION_FILE }}
     - name: Publish
       run: dotnet publish ${{ env.SOLUTION_FILE }} --output ${{ env.PUBLISH_FOLDER }} --configuration Release
-    - name: Zip Release Linux
-      uses: thedoctor0/zip-release@master
-      with:
-        filename: ${{ env.PUBLISH_FOLDER }}/${{ env.MACOS_PACKAGE_NAME }}.zip
-        path: ${{ env.PUBLISH_FOLDER }}
+    #- name: Zip Release Linux
+    #  uses: thedoctor0/zip-release@master
+    #  with:
+    #    filename: ${{ env.PUBLISH_FOLDER }}/${{ env.MACOS_PACKAGE_NAME }}.zip
+    #    path: ${{ env.PUBLISH_FOLDER }}
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ env.MACOS_PACKAGE_NAME }}
-        path: ${{ env.PUBLISH_FOLDER }}/${{ env.MACOS_PACKAGE_NAME }}.zip
+        path: ${{ env.PUBLISH_FOLDER }}
 
   create_release_and_publish_artifacts:
     needs: [build_windows,build_linux,build_macos]

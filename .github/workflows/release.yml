@@ -11,7 +11,7 @@ env:
   RELEASE_NAME: azureAD-groups-exporter
   WINDOWS_PACKAGE_NAME: azureAD-groups-exporter-windows
   LINUX_PACKAGE_NAME: azureAD-groups-exporter-linux
-  MAC_PACKAGE_NAME: azureAD-groups-exporter-macos
+  MACOS_PACKAGE_NAME: azureAD-groups-exporter-macos
 
 jobs:
   build_windows:
@@ -59,8 +59,32 @@ jobs:
         name: ${{ env.LINUX_PACKAGE_NAME }}
         path: ${{ env.PUBLISH_FOLDER }}/${{ env.LINUX_PACKAGE_NAME }}.zip
 
+  build_macos:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.SOLUTION_FILE }}
+    - name: Publish
+      run: dotnet publish ${{ env.SOLUTION_FILE }} --output ${{ env.PUBLISH_FOLDER }} --configuration Release
+    - name: Zip Release Linux
+      uses: thedoctor0/zip-release@master
+      with:
+        filename: ${{ env.PUBLISH_FOLDER }}/${{ env.MACOS_PACKAGE_NAME }}.zip
+        path: ${{ env.PUBLISH_FOLDER }}
+    - uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.MACOS_PACKAGE_NAME }}
+        path: ${{ env.PUBLISH_FOLDER }}/${{ env.MACOS_PACKAGE_NAME }}.zip
+
   create_release_and_publish_artifacts:
-    needs: [build_windows,build_linux]
+    needs: [build_windows,build_linux,build_macos]
     runs-on: windows-latest
     steps:
     - uses: actions/download-artifact@v2
@@ -79,7 +103,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
       with:
         tag_name: ${{ github.ref }}
-        release_name: ${{ env.RELEASE_NAME }}-${{ github.ref }}          
+        release_name: ${{ env.RELEASE_NAME }}-${{ github.ref }}
         draft: false
         prerelease: false
     - name: Upload Release Asset - Windows
@@ -102,4 +126,13 @@ jobs:
         asset_path: ${{ env.PUBLISH_FOLDER }}/${{ env.LINUX_PACKAGE_NAME }}.zip
         asset_name: ${{ env.LINUX_PACKAGE_NAME }}.zip
         asset_content_type: application/zip
-      
+    - name: Upload Release Asset - MacOs
+      id: upload-release-asset-macos 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: ${{ env.PUBLISH_FOLDER }}/${{ env.MACOS_PACKAGE_NAME }}.zip
+        asset_name: ${{ env.MACOS_PACKAGE_NAME }}.zip
+        asset_content_type: application/zip

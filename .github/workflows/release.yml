@@ -21,15 +21,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Extract tag name
-      id: tag
-      uses: actions/github-script@0.2.0
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          return context.payload.ref.replace(/\/refs\/tags\//, '');
-    - name: Echo
-      run: echo ${{ steps.tag.outputs.result }}
+    - name: Run powershell
+      run: Write-Host "Versao tag $GITHUB_REF"
         
     - name: Setup .NET
       uses: actions/setup-dotnet@v1

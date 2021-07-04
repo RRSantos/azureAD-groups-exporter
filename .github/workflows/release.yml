@@ -3,7 +3,7 @@ on:
   push:
     # Sequence of patterns matched against refs/tags
     tags:
-      - 'v*.*.*' # Push events to matching v*, i.e. v1.0, v20.15.10
+      - 'v*\.*\.*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 env:
   SOLUTION_FILE: src/azureAD-groups-exporter/azureAD-groups-exporter.sln
@@ -27,7 +27,7 @@ jobs:
           RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
         run: echo ${{ steps.vars.outputs.tag }}
   build_windows:
-
+    needs: [get_tag_number]
     runs-on: windows-latest
 
     steps:
@@ -53,7 +53,7 @@ jobs:
         path: ${{ env.PUBLISH_FOLDER }}/${{ env.WINDOWS_PACKAGE_NAME }}.zip
 
   build_linux:
-
+    needs: [get_tag_number]
     runs-on: ubuntu-latest
 
     steps:
@@ -74,7 +74,7 @@ jobs:
         path: ${{ env.PUBLISH_FOLDER }}/${{ env.LINUX_PACKAGE_NAME }}.zip
 
   build_macos:
-
+    needs: [get_tag_number]
     runs-on: macos-latest
 
     steps:

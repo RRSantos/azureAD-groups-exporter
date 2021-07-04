@@ -18,15 +18,21 @@ namespace azureAD_groups_exporter
                    .WithParsed(o =>
                    {
                        stopwatch.Start();
-                       GroupMemberService service = new GroupMemberService(o.TenantId, o.ClientId, o.ClientSecret);
+
+                       Microsoft.Graph.IGraphServiceClient graphServiceClient = GraphServiceClientBuilder.Create(
+                           o.TenantId,
+                           o.ClientId,
+                           o.ClientSecret);
+                       
+                       GroupMemberService service = new GroupMemberService(graphServiceClient);
                        var allEntities = service.GetAllGroupsAndMembers(o.ExportUsers).Result;
                        stopwatch.Stop();
-                       Console.WriteLine($"Elapsed time to get all groups am members: {stopwatch.Elapsed}");
+                       Console.WriteLine($"Elapsed time to get all groups and its members: {stopwatch.Elapsed}");
                        
                        stopwatch.Restart();
                        
                        exportHTML(allEntities, o.OutputFolder);
-                       Console.WriteLine($"Elapsed time to export all groups am members: {stopwatch.Elapsed}");
+                       Console.WriteLine($"Elapsed time to export all groups and its members: {stopwatch.Elapsed}");
                    }); 
         }
 

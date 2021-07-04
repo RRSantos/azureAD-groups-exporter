@@ -10,99 +10,92 @@ namespace azureAD_groups_exporter
 {
     class GroupMemberService
     {
-        private const string BASE_URL = "https://login.microsoftonline.com";
-        private const string SCOPE = "https://graph.microsoft.com/.default";
-        private GraphServiceClient graphServiceClient;
-        private readonly string tenantID;
-        private readonly string clientId;
-        private readonly string clientSecret;
-
-        private readonly List<Group>  groupsCache = new List<Group>();
+        private readonly IGraphServiceClient graphServiceClient;
+        private readonly List<Group> groupsCache = new List<Group>();
         private readonly List<User> usersCache = new List<User>();
 
-        public GroupMemberService(string tenantID, string clientId, string clientSecret)
+        public GroupMemberService(IGraphServiceClient graphServiceClient)
         {
-            this.tenantID = tenantID;
-            this.clientId = clientId;
-            this.clientSecret = clientSecret;
-
-            initializeInternalFields();
+            this.graphServiceClient = graphServiceClient;
         }
 
-        private void initializeInternalFields()
+        private async Task<Model.EntityItem> convertToEntityItem(DirectoryObject directoryObject, bool exportUsers)
         {
-            string instanceUrl = $"{BASE_URL}/{tenantID}";
-            IConfidentialClientApplication app = ConfidentialClientApplicationBuilder.Create(clientId)
-                    .WithClientSecret(clientSecret)
-                    .WithAuthority(new Uri(instanceUrl))
-                    .Build();
+            Model.EntityItem internalEntity = null;
 
-            string[] scopes = new string[] { SCOPE };
-            AuthenticationResult result = app.AcquireTokenForClient(scopes).ExecuteAsync().Result;
+            if (directoryObject is Group actualGroup)
+            {
+                internalEntity = new Model.EntityItem(
+                    actualGroup.DisplayName,
+                    actualGroup.Id,
+                    actualGroup.Mail,
+                    Model.EntityType.Group);
 
-            graphServiceClient = new GraphServiceClient(new DelegateAuthenticationProvider((requestMessage) => {
-                requestMessage
-                    .Headers
-                    .Authorization = new AuthenticationHeaderValue("Bearer", result.AccessToken);
+                Group actualGroupWithMembers = groupsCache.FirstOrDefault(g => g.Id == actualGroup.Id);
 
-                return Task.CompletedTask;
-            }));
+                if (actualGroupWithMembers == null)
+                {
+                    actualGroupWithMembers = await getGroupFromAD(actualGroup.Id);
+                    groupsCache.Add(actualGroupWithMembers);
+                }
+
+                if (actualGroupWithMembers.Members != null)
+                {
+                    await addAllChildrenForGroup(actualGroupWithMembers, internalEntity, exportUsers);
+                }
+                
+            }
+            else if ((directoryObject is User) && exportUsers)
+            {
+                User user = usersCache.FirstOrDefault(u => u.Id == directoryObject.Id);
+
+                if (user == null)
+                {
+                    user = await getUserFromAD(directoryObject.Id);
+                    usersCache.Add(user);
+                }
+
+                internalEntity = new Model.EntityItem(
+                    user.DisplayName,
+                    user.Id,
+                    user.Mail,
+                    Model.EntityType.User);
+            }
+
+            return internalEntity;
+
         }
-        private async Task setAllChilds(Group group, Model.EntityItem entity, bool exportUsers)
+
+        private async Task<Group> getGroupFromAD(string groupId)
+        {
+            IGraphServiceGroupsCollectionPage allGroups = await graphServiceClient
+                    .Groups
+                    .Request()
+                    .Filter($"id eq '{groupId}'")
+                    .Expand("Members")
+                    .GetAsync();
+
+            return allGroups.First();
+        }
+
+        private async Task<User> getUserFromAD(string userID)
+        {
+            IGraphServiceUsersCollectionPage allUsers = await graphServiceClient
+                    .Users
+                    .Request()
+                    .Filter($"id eq '{userID}'")
+                    .GetAsync();
+
+            return allUsers.First();
+        }
+
+        private async Task addAllChildrenForGroup(Group group, Model.EntityItem entity, bool exportUsers)
         {
             foreach (var m in group.Members)
             {
-                if (m is Group actualGroup)
+                Model.EntityItem internalEntity = await convertToEntityItem(m, exportUsers);
+                if (internalEntity != null)
                 {
-                    Model.EntityItem internalEntity = new Model.EntityItem(
-                        actualGroup.DisplayName, 
-                        actualGroup.Id,
-                        actualGroup.Mail,
-                        Model.EntityType.Group);
-                    entity.AddChild(internalEntity);
-
-                    Group actualGroupWithMembers = groupsCache.FirstOrDefault( g => g.Id == actualGroup.Id);
-
-                    if (actualGroupWithMembers == null)
-                    {
-                        IGraphServiceGroupsCollectionPage allGroups = await graphServiceClient
-                        .Groups
-                        .Request()
-                        .Filter($"id eq '{actualGroup.Id}'")
-                        .Expand("Members")
-                        .GetAsync();
-
-                        actualGroupWithMembers = allGroups.First();
-                        groupsCache.Add(actualGroupWithMembers);
-                    }                    
-
-                    if (actualGroupWithMembers.Members != null)
-                    {
-                        await setAllChilds(actualGroupWithMembers, internalEntity, exportUsers);
-                    }
-                }
-                else if ((m is User) && exportUsers)
-                {   
-                    User user = usersCache.FirstOrDefault(u => u.Id == m.Id);
-
-                    if (user == null)
-                    {
-                        IGraphServiceUsersCollectionPage allUsers = await graphServiceClient
-                        .Users
-                        .Request()
-                        .Filter($"id eq '{m.Id}'")
-                        .GetAsync();
-
-                        user = allUsers.First();
-                        usersCache.Add(user);
-                    }
-
-
-                    Model.EntityItem internalEntity = new Model.EntityItem(
-                        user.DisplayName, 
-                        user.Id,
-                        user.Mail,
-                        Model.EntityType.User);
                     entity.AddChild(internalEntity);
                 }
             }
@@ -118,19 +111,20 @@ namespace azureAD_groups_exporter
 
             List<Model.EntityItem> allEntities = new List<Model.EntityItem>();
             foreach (var group in allGroups)
-            {   
+            {
                 if (!groupsCache.Exists(e => e.Id == group.Id))
                 {
                     groupsCache.Add(group);
                     Model.EntityItem nextEntity = new Model.EntityItem(
-                        group.DisplayName, 
+                        group.DisplayName,
                         group.Id,
                         group.Mail,
                         Model.EntityType.Group);
-                    await setAllChilds(group, nextEntity, exportUsers);
+                    await addAllChildrenForGroup(group, nextEntity, exportUsers);
+                    
                     allEntities.Add(nextEntity);
                 }
-                
+
             }
 
             return allEntities;

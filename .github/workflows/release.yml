@@ -22,7 +22,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run powershell
-      run: Write-Host "Versao tag $(${env:GITHUB_REF} -replace 'refs/\w+/', '')"
+      run: build/windows.build.ps1
         
     - name: Setup .NET
       uses: actions/setup-dotnet@v1

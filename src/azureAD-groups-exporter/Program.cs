@@ -12,7 +12,7 @@ namespace azureAD_groups_exporter
                    .WithParsed(o =>
                    {
                        Microsoft.Graph.IGraphServiceClient graphServiceClient = GraphServiceClientBuilder.Create(
-                           o.TenantId,
+                           o.DirectoryId,
                            o.ClientId,
                            o.ClientSecret);
                        

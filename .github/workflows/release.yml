@@ -15,28 +15,21 @@ env:
 
 jobs:
 
-  get_tag_number:
-    runs-on: ubuntu-latest    
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set version from tag
-        id: vars
-        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
-      - name: Check output
-        env:
-          RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
-        run: echo ${{ steps.vars.outputs.tag }}
   build_windows:
-    needs: [get_tag_number]
+
     runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set version from tag
-      id: vars
-      run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
-    - name: Check output
-      run: echo ${{ steps.vars.outputs.tag }}
+    - name: Extract tag name
+      id: tag
+      uses: actions/github-script@0.2.0
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          return context.payload.ref.replace(/\/refs\/tags\//, '');
+    - name: Echo
+      run: echo ${{ steps.tag.outputs.result }}
         
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
@@ -45,7 +38,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore ${{ env.SOLUTION_FILE }}
     - name: Publish
-      run: dotnet publish ${{ env.SOLUTION_FILE }} --output ${{ env.PUBLISH_FOLDER }} --configuration Release --version-suffix ${{ steps.vars.outputs.tag }}
+      run: dotnet publish ${{ env.SOLUTION_FILE }} --output ${{ env.PUBLISH_FOLDER }} --configuration Release --version-suffix ${{ steps.tag.outputs.result }}
     - name: Zip Release Windows
       run: cd ${{ env.PUBLISH_FOLDER }} && tar.exe -a -c -f ${{ env.WINDOWS_PACKAGE_NAME }}.zip *.exe *.dll *.json Template/*.* -C ${{ env.PUBLISH_FOLDER }} && cd ..    
     - uses: actions/upload-artifact@v2
@@ -54,7 +47,7 @@ jobs:
         path: ${{ env.PUBLISH_FOLDER }}/${{ env.WINDOWS_PACKAGE_NAME }}.zip
 
   build_linux:
-    needs: [get_tag_number]
+    
     runs-on: ubuntu-latest
 
     steps:
@@ -75,7 +68,7 @@ jobs:
         path: ${{ env.PUBLISH_FOLDER }}/${{ env.LINUX_PACKAGE_NAME }}.zip
 
   build_macos:
-    needs: [get_tag_number]
+    
     runs-on: macos-latest
 
     steps:

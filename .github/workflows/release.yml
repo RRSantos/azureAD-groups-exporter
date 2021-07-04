@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest    
     steps:
       - uses: actions/checkout@v2
-      - name: Set output
+      - name: Set version from tag
         id: vars
         run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
       - name: Check output
@@ -32,10 +32,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Check output windows
-      run: | 
-        echo ${{ jobs.get_tag_number.steps.vars.outputs.tag }} 1
-        echo ${{ jobs.get_tag_number.steps.env.RELEASE_VERSION }} 2
+    - name: Set version from tag
+      id: vars
+      run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+    - name: Check output
+      run: echo ${{ steps.vars.outputs.tag }}
         
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
@@ -44,7 +45,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore ${{ env.SOLUTION_FILE }}
     - name: Publish
-      run: dotnet publish ${{ env.SOLUTION_FILE }} --output ${{ env.PUBLISH_FOLDER }} --configuration Release --version-suffix ${{ get_tag_number.steps.vars.outputs.tag }}
+      run: dotnet publish ${{ env.SOLUTION_FILE }} --output ${{ env.PUBLISH_FOLDER }} --configuration Release --version-suffix ${{ steps.vars.outputs.tag }}
     - name: Zip Release Windows
       run: cd ${{ env.PUBLISH_FOLDER }} && tar.exe -a -c -f ${{ env.WINDOWS_PACKAGE_NAME }}.zip *.exe *.dll *.json Template/*.* -C ${{ env.PUBLISH_FOLDER }} && cd ..    
     - uses: actions/upload-artifact@v2

@@ -1,9 +1,7 @@
 ﻿using Microsoft.Graph;
-using Microsoft.Identity.Client;
-using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Net.Http.Headers;
+
 using System.Threading.Tasks;
 
 namespace azureAD_groups_exporter

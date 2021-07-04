@@ -8,10 +8,10 @@ on:
 env:
   SOLUTION_FILE: src/azureAD-groups-exporter/azureAD-groups-exporter.sln
   PUBLISH_FOLDER: publish
-  RELEASE_NAME_PREFIX: azureAD-groups-exporter
-  WINDOWS_PACKAGE_NAME: ${{ env.RELEASE_NAME_PREFIX }}-windows
-  LINUX_PACKAGE_NAME: ${{ env.RELEASE_NAME_PREFIX }}-linux
-  MAC_PACKAGE_NAME: ${{ env.RELEASE_NAME_PREFIX }}-macos
+  RELEASE_NAME: azureAD-groups-exporter
+  WINDOWS_PACKAGE_NAME: azureAD-groups-exporter-windows
+  LINUX_PACKAGE_NAME: azureAD-groups-exporter-linux
+  MAC_PACKAGE_NAME: azureAD-groups-exporter-macos
 
 jobs:
   build_windows:

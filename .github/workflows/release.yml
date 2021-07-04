@@ -1,0 +1,46 @@
+name: Release
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+
+jobs:
+  build_windows:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Restore dependencies
+      run: dotnet restore src/azureAD-groups-exporter/azureAD-groups-exporter.sln    
+    - name: Publish
+      run: dotnet publish src/azureAD-groups-exporter/azureAD-groups-exporter.sln --output publish/ --configuration Release
+    - name: Zip Release Windows
+      run: cd publish && tar.exe -a -c -f azureAD-groups-exporter-windows.zip *.exe *.dll *.json Template/*.* -C publish && cd ..
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: azureAD-groups-exporter-${{ github.ref }}          
+        draft: false
+        prerelease: false
+    - name: Upload Release Asset - Windows
+      id: upload-release-asset-windows 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: publish/azureAD-groups-exporter-windows.zip
+        asset_name: azureAD-groups-exporter-windows.zip
+        asset_content_type: application/zip
+      

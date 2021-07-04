@@ -3,7 +3,7 @@ on:
   push:
     # Sequence of patterns matched against refs/tags
     tags:
-      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+      - 'v*.*.*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 env:
   SOLUTION_FILE: src/azureAD-groups-exporter/azureAD-groups-exporter.sln
@@ -14,12 +14,29 @@ env:
   MACOS_PACKAGE_NAME: azureAD-groups-exporter-macos
 
 jobs:
+
+  get_tag_number:
+    runs-on: ubuntu-latest    
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set output
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+      - name: Check output
+        env:
+          RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
+        run: echo ${{ steps.vars.outputs.tag }}
   build_windows:
 
     runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v2
+    - name: Check output windows
+      run: | 
+        echo ${{ get_tag_number.steps.vars.outputs.tag }} 1
+        echo ${{ get_tag_number.env.RELEASE_VERSION }} 2
+        
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
@@ -27,7 +44,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore ${{ env.SOLUTION_FILE }}
     - name: Publish
-      run: dotnet publish ${{ env.SOLUTION_FILE }} --output ${{ env.PUBLISH_FOLDER }} --configuration Release --version-suffix ${{ github.ref }}
+      run: dotnet publish ${{ env.SOLUTION_FILE }} --output ${{ env.PUBLISH_FOLDER }} --configuration Release --version-suffix ${{ get_tag_number.steps.vars.outputs.tag }}
     - name: Zip Release Windows
       run: cd ${{ env.PUBLISH_FOLDER }} && tar.exe -a -c -f ${{ env.WINDOWS_PACKAGE_NAME }}.zip *.exe *.dll *.json Template/*.* -C ${{ env.PUBLISH_FOLDER }} && cd ..    
     - uses: actions/upload-artifact@v2

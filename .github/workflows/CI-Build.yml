@@ -8,10 +8,11 @@ on:
 
 jobs:
       
-  build_windows:
-
-    runs-on: windows-latest
-
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET
@@ -25,36 +26,36 @@ jobs:
     - name: Test
       run: dotnet test src/azureAD-groups-exporter/azureAD-groups-exporter.sln --no-build --verbosity normal
       
-  build_ubuntu:
+  #build_ubuntu:
 
-    runs-on: ubuntu-latest
+  #  runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 5.0.x
-    - name: Restore dependencies
-      run: dotnet restore src/azureAD-groups-exporter/azureAD-groups-exporter.sln
-    - name: Build
-      run: dotnet build src/azureAD-groups-exporter/azureAD-groups-exporter.sln --no-restore
-    - name: Test
-      run: dotnet test src/azureAD-groups-exporter/azureAD-groups-exporter.sln --no-build --verbosity normal
+  #  steps:
+  #  - uses: actions/checkout@v2
+  #  - name: Setup .NET
+  #    uses: actions/setup-dotnet@v1
+  #    with:
+  #      dotnet-version: 5.0.x
+  #  - name: Restore dependencies
+  #    run: dotnet restore src/azureAD-groups-exporter/azureAD-groups-exporter.sln
+  #  - name: Build
+  #    run: dotnet build src/azureAD-groups-exporter/azureAD-groups-exporter.sln --no-restore
+  #  - name: Test
+  #    run: dotnet test src/azureAD-groups-exporter/azureAD-groups-exporter.sln --no-build --verbosity normal
 
-  build_mac:
+  #build_mac:
 
-    runs-on: macos-latest
+  #  runs-on: macos-latest
 
-    steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 5.0.x
-    - name: Restore dependencies
-      run: dotnet restore src/azureAD-groups-exporter/azureAD-groups-exporter.sln
-    - name: Build
-      run: dotnet build src/azureAD-groups-exporter/azureAD-groups-exporter.sln --no-restore
-    - name: Test
-      run: dotnet test src/azureAD-groups-exporter/azureAD-groups-exporter.sln --no-build --verbosity normal
+  #  steps:
+  #  - uses: actions/checkout@v2
+  #  - name: Setup .NET
+  #    uses: actions/setup-dotnet@v1
+  #    with:
+  #      dotnet-version: 5.0.x
+  #  - name: Restore dependencies
+  #    run: dotnet restore src/azureAD-groups-exporter/azureAD-groups-exporter.sln
+  #  - name: Build
+  #    run: dotnet build src/azureAD-groups-exporter/azureAD-groups-exporter.sln --no-restore
+  #  - name: Test
+  #    run: dotnet test src/azureAD-groups-exporter/azureAD-groups-exporter.sln --no-build --verbosity normal

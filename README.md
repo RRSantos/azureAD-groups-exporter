@@ -1,8 +1,8 @@
-# azureAD-groups-exporter
-Simple CLI tool to export all Azure AD groups and its members to single HTML page using [dabeng's OrgChart](https://github.com/dabeng/OrgChart)
-
 [![Windows build](https://github.com/RRSantos/azureAD-groups-exporter/actions/workflows/CI-Windows.yml/badge.svg)](https://github.com/RRSantos/azureAD-groups-exporter/actions/workflows/CI-Windows.yml)
 [![Linux build](https://github.com/RRSantos/azureAD-groups-exporter/actions/workflows/CI-Ubuntu.yml/badge.svg)](https://github.com/RRSantos/azureAD-groups-exporter/actions/workflows/CI-Ubuntu.yml)
+
+# azureAD-groups-exporter
+Simple CLI tool to export all Azure AD groups and its members to a single HTML page using [dabeng's OrgChart](https://github.com/dabeng/OrgChart)
 
 ## Getting started
 ### Setup Azure pre-requsites
@@ -31,7 +31,7 @@ azureAD-groups-exporter.exe --directoryID <directory-ID> --clientID <client-ID> 
 |exportUsers| no | Use this flag (True) to export Users as members from groups | False|
 
 #### Examples
-1. Exporting Groups **and** users to folder ``C:\temp\myExportResult``:
+1. Exporting **groups and users** to folder ``C:\temp\myExportResult``:
   - Tenant ID : `693ba13e-f7ab-4bc1-8cee-edd404e8050c`;
   - Client ID : `6d8bf485-d38a-4e14-a5ac-dd278351d2f5`;
   - Client Secret : `W3VvnNW_10yy~aa~wO0.5bB.jj~0NnIiZ9`;
@@ -40,7 +40,7 @@ azureAD-groups-exporter.exe --directoryID <directory-ID> --clientID <client-ID> 
 azureAD-groups-exporter.exe --directoryID 693ba13e-f7ab-4bc1-8cee-edd404e8050c --clientID 6d8bf485-d38a-4e14-a5ac-dd278351d2f5 --clientSecret W3VvnNW_10yy~aa~wO0.5bB.jj~0NnIiZ9 --outputFolder "C:\temp\myExportResult" --exportUsers
 ```
 
-2. Exporting only groups to folder ``/home/user/myExportResult``:
+2. Exporting **only groups** to folder ``/home/user/myExportResult``:
   - Tenant ID : `693ba13e-f7ab-4bc1-8cee-edd404e8050c`;
   - Client ID : `6d8bf485-d38a-4e14-a5ac-dd278351d2f5`;
   - Client Secret : `W3VvnNW_10yy~aa~wO0.5bB.jj~0NnIiZ9`;

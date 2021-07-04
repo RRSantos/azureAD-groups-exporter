@@ -10,11 +10,5 @@ namespace azureAD_groups_exporter_tests
         {
             Assert.True(true);
         }
-
-        [Fact]
-        public void ShouldNotPass()
-        {
-            Assert.True(false);
-        }
     }
 }

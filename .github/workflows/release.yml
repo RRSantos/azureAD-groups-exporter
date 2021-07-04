@@ -27,7 +27,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore ${{ env.SOLUTION_FILE }}
     - name: Publish
-      run: dotnet publish ${{ env.SOLUTION_FILE }} --output ${{ env.PUBLISH_FOLDER }} --configuration Release
+      run: dotnet publish ${{ env.SOLUTION_FILE }} --output ${{ env.PUBLISH_FOLDER }} --configuration Release --version-suffix ${{ github.ref }}
     - name: Zip Release Windows
       run: cd ${{ env.PUBLISH_FOLDER }} && tar.exe -a -c -f ${{ env.WINDOWS_PACKAGE_NAME }}.zip *.exe *.dll *.json Template/*.* -C ${{ env.PUBLISH_FOLDER }} && cd ..    
     - uses: actions/upload-artifact@v2
@@ -48,14 +48,9 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore ${{ env.SOLUTION_FILE }}
     - name: Publish
-      run: dotnet publish ${{ env.SOLUTION_FILE }} --output ${{ env.PUBLISH_FOLDER }} --configuration Release
+      run: dotnet publish ${{ env.SOLUTION_FILE }} --output ${{ env.PUBLISH_FOLDER }} --configuration Release --version-suffix ${{ github.ref }}
     - name: Zip Release Linux
-      run: cd ${{ env.PUBLISH_FOLDER }} && zip ${{ env.LINUX_PACKAGE_NAME }}.zip * -r && cd .. 
-    #- name: Zip Release Linux
-    #  uses: thedoctor0/zip-release@master
-    #  with:
-    #    filename: ${{ env.PUBLISH_FOLDER }}/${{ env.LINUX_PACKAGE_NAME }}.zip
-    #    path: ${{ env.PUBLISH_FOLDER }}
+      run: cd ${{ env.PUBLISH_FOLDER }} && zip ${{ env.LINUX_PACKAGE_NAME }}.zip * -r && cd ..
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ env.LINUX_PACKAGE_NAME }}
@@ -74,14 +69,9 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore ${{ env.SOLUTION_FILE }}
     - name: Publish
-      run: dotnet publish ${{ env.SOLUTION_FILE }} --output ${{ env.PUBLISH_FOLDER }} --configuration Release
+      run: dotnet publish ${{ env.SOLUTION_FILE }} --output ${{ env.PUBLISH_FOLDER }} --configuration Release --version-suffix ${{ github.ref }}
     - name: Zip Release MacOs
-      run: cd ${{ env.PUBLISH_FOLDER }} && zip ${{ env.MACOS_PACKAGE_NAME }}.zip * -r && cd .. 
-    #- name: Zip Release Linux
-    #  uses: thedoctor0/zip-release@master
-    #  with:
-    #    filename: ${{ env.PUBLISH_FOLDER }}/${{ env.MACOS_PACKAGE_NAME }}.zip
-    #    path: ${{ env.PUBLISH_FOLDER }}
+      run: cd ${{ env.PUBLISH_FOLDER }} && zip ${{ env.MACOS_PACKAGE_NAME }}.zip * -r && cd ..
     - uses: actions/upload-artifact@v2
       with:
         name: ${{ env.MACOS_PACKAGE_NAME }}

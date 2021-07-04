@@ -1,5 +1,4 @@
-[![Windows ci build](https://github.com/RRSantos/azureAD-groups-exporter/actions/workflows/CI-Windows.yml/badge.svg)](https://github.com/RRSantos/azureAD-groups-exporter/actions/workflows/CI-Windows.yml)
-[![Linux ci build](https://github.com/RRSantos/azureAD-groups-exporter/actions/workflows/CI-Ubuntu.yml/badge.svg)](https://github.com/RRSantos/azureAD-groups-exporter/actions/workflows/CI-Ubuntu.yml)
+[![CI build](https://github.com/RRSantos/azureAD-groups-exporter/actions/workflows/CI-Build.yml/badge.svg)](https://github.com/RRSantos/azureAD-groups-exporter/actions/workflows/CI-Build.yml)
 [![Release](https://github.com/RRSantos/azureAD-groups-exporter/actions/workflows/release.yml/badge.svg)](https://github.com/RRSantos/azureAD-groups-exporter/actions/workflows/release.yml)
 
 # azureAD-groups-exporter
